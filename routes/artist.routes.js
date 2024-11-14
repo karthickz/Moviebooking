@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const artistController = require('../controllers/artistController');
 
-// Define your artist route
+// Route to get all artists
 router.get('/', artistController.findAllArtists);
 
 module.exports = router;

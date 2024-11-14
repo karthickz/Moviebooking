@@ -1,33 +1,38 @@
 const Movie = require('../models/movie.model');
 
-// Fetch all movies
+// Fetch all movies or filter by status
 exports.findAllMovies = async (req, res) => {
+    const { status, title, genres, artists, start_date, end_date } = req.query;
+    let filter = {};
+    if (status) filter.status = status;
+    if (title) filter.title = { $regex: title, $options: 'i' };
+    // Add additional filtering for genres, artists, dates as needed
     try {
-        const movies = await Movie.find();
-        res.json({ message: 'All Movies Data in JSON format from Mongo DB', movies });
+        const movies = await Movie.find(filter);
+        res.json(movies);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching movies', error: err.message });
     }
 };
 
-// Fetch one movie by ID
+// Fetch movie details by ID
 exports.findOne = async (req, res) => {
-    const movieId = req.params.movieId;
     try {
-        const movie = await Movie.findById(movieId);
-        res.json({ message: `Movie details for ${movieId}`, movie });
+        const movie = await Movie.findById(req.params.movieId);
+        if (!movie) return res.status(404).json({ message: 'Movie not found' });
+        res.json(movie);
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching movie', error: err.message });
+        res.status(500).json({ message: 'Error fetching movie details', error: err.message });
     }
 };
 
-// Fetch shows for a specific movie by ID
+// Fetch shows of a specific movie by ID
 exports.findShows = async (req, res) => {
-    const movieId = req.params.movieId;
     try {
-        const movie = await Movie.findById(movieId).populate('shows');
-        res.json({ message: `Shows for movie ${movieId}`, shows: movie.shows });
+        const movie = await Movie.findById(req.params.movieId);
+        if (!movie) return res.status(404).json({ message: 'Movie not found' });
+        res.json({ shows: movie.shows });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching shows', error: err.message });
+        res.status(500).json({ message: 'Error fetching movie shows', error: err.message });
     }
 };

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const genreController = require('../controllers/genreController');
 
-// Define your genre route
+// Route to get all genres
 router.get('/', genreController.findAllGenres);
 
 module.exports = router;
